@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Feedback{% endblock %}
+
+
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title mb-0">Student Feedback</h1>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th width="5%">ID</th>
+                        <th width="20%">Student Name</th>
+                        <th width="15%">Course</th>
+                        <th width="30%">Message</th>
+                        <th width="15%">Date</th>
+                        <th width="15%">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for feedback in feedbacks %}
+                    <tr>
+                        <td>{{ feedback.id }}</td>
+                        <td>{{ feedback.student.admin.first_name }} {{ feedback.student.admin.last_name }}</td>
+                        <td>{{ feedback.student.course_id.name }}</td>
+                        <td>
+                            <p class="mb-0">{{ feedback.feedback }}</p>
+                            {% if feedback.feedback_reply %}
+                            <div class="mt-1">
+                                <small class="text-success p-1 bg-light rounded d-inline-block">
+                                    <i class="fas fa-reply me-1"></i> Admin: {{ feedback.feedback_reply }}
+                                </small>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>{{ feedback.created_at|date:"d M Y" }}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#replyModal{{ feedback.id }}">
+                                {% if feedback.feedback_reply %}Update Reply{% else %}Reply{% endif %}
+                            </button>
+                        </td>
+                    </tr>
+
+                    <!-- Reply Modal -->
+                    <div class="modal fade" id="replyModal{{ feedback.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Reply to Feedback</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <form action="{% url 'admin_reply_student_feedback' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="feedback_id" value="{{ feedback.id }}">
+                                    <div class="modal-body">
+                                        <p><strong>Feedback:</strong> {{ feedback.feedback }}</p>
+                                        <div class="form-group">
+                                            <label>Reply Message</label>
+                                            <textarea class="form-control" name="reply_message" rows="4"
+                                                required>{{ feedback.feedback_reply }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Send Reply</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">No Feedback Found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

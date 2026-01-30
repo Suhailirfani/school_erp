@@ -1,0 +1,60 @@
+{% extends 'Accountant/base_template.html' %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Add Expense</h3>
+                    </div>
+                    <form action="{% url 'add_expense' %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Expense Head</label>
+                                <select class="form-control" name="head_id" required>
+                                    <option value="">Select Category</option>
+                                    {% for head in heads %}
+                                    <option value="{{ head.id }}">{{ head.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Amount</label>
+                                <input type="number" step="0.01" class="form-control" name="amount" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input type="date" class="form-control" name="date" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea class="form-control" name="description"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Receipt / Voucher (Optional)</label>
+                                <input type="file" class="form-control" name="receipt_file">
+                            </div>
+
+                            {% if messages %}
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary btn-block">Add Expense</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}

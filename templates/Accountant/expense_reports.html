@@ -1,0 +1,77 @@
+{% extends 'Accountant/base_template.html' %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Expense Reports</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="GET">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Start Date</label>
+                                        <input type="date" class="form-control" name="start_date"
+                                            value="{{ start_date }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>End Date</label>
+                                        <input type="date" class="form-control" name="end_date" value="{{ end_date }}"
+                                            required>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label>&nbsp;</label>
+                                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <hr>
+
+                        {% if start_date %}
+                        <h4 class="text-center">Expenses from {{ start_date }} to {{ end_date }}</h4>
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Added By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for expense in expenses %}
+                                <tr>
+                                    <td>{{ expense.date }}</td>
+                                    <td>{{ expense.head.name }}</td>
+                                    <td>{{ expense.description }}</td>
+                                    <td>{{ expense.amount }}</td>
+                                    <td>{{ expense.added_by.first_name }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-danger text-white">
+                                    <th colspan="3" class="text-right">Total Expenses:</th>
+                                    <th colspan="2">{{ total_expense }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        {% else %}
+                        <p class="text-center text-muted">Select dates to view report.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}

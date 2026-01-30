@@ -1,0 +1,21 @@
+Student used for test: AASIYA THAJ
+Course Name in Python: 'Plus Two - Science'
+
+Literal string NOT found. Searching for course name...
+Course name NOT found in output.
+
+Snippet around 'Recent Students' row:
+AASIYA THAJ</td>
+                                <td><span class="badge badge-modern badge-gradient-purple">{{ student.course_id.name
+                                        }}</span></td>
+                                <td><small class="text-muted">Jan 17, 2026</small></td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Enquiries -->

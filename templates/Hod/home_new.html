@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}HOD Dashboard - Student Management System{% endblock %}
+
+
+
+{% block content %}
+<h1 class="page-title">Dashboard Overview</h1>
+
+<!-- Statistics Cards -->
+<div class="row stagger-animation mb-4">
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="stat-number">{{ students_count }}</div>
+            <div class="stat-label">Total Students</div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="stat-card success">
+            <div class="stat-icon">
+                <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <div class="stat-number">{{ staff_count }}</div>
+            <div class="stat-label">Total Staff</div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="stat-card info">
+            <div class="stat-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="stat-number">{{ courses_count }}</div>
+            <div class="stat-label">Total Courses</div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <div class="stat-number">{{ subjects_count }}</div>
+            <div class="stat-label">Total Subjects</div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Actions Row -->
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <i class="fas fa-file-alt fa-3x text-warning mb-3"></i>
+                <h4 class="fw-bold">{{ pending_student_leaves }}</h4>
+                <p class="text-muted mb-0">Pending Student Leaves</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <i class="fas fa-file-signature fa-3x text-info mb-3"></i>
+                <h4 class="fw-bold">{{ pending_staff_leaves }}</h4>
+                <p class="text-muted mb-0">Pending Staff Leaves</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <i class="fas fa-comments fa-3x text-success mb-3"></i>
+                <h4 class="fw-bold">{{ unread_student_feedbacks }}</h4>
+                <p class="text-muted mb-0">Unread Student Feedback</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <i class="fas fa-comment-dots fa-3x text-primary mb-3"></i>
+                <h4 class="fw-bold">{{ unread_staff_feedbacks }}</h4>
+                <p class="text-muted mb-0">Unread Staff Feedback</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Students -->
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-user-graduate text-primary me-2"></i>
+                    Recent Students
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Course</th>
+                                <th>Added</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in recent_students %}
+                            <tr>
+                                <td>{{ student.admin.first_name }} {{ student.admin.last_name }}</td>
+                                <td><span class="badge badge-modern badge-gradient-purple">{{ student.course_id.name}}</span></td>
+                                <td><small class="text-muted">{{ student.created_at|date:"M d, Y" }}</small></td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-4">No students yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Enquiries -->
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-question-circle text-success me-2"></i>
+                    Recent Enquiries
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Course</th>
+                                <th>Phone</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enquiry in recent_enquiries %}
+                            <tr>
+                                <td>{{ enquiry.name }}</td>
+                                <td><span class="badge badge-modern badge-gradient-success">{{ enquiry.course.name
+                                        }}</span></td>
+                                <td><small>{{ enquiry.phone_number }}</small></td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-4">No enquiries yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

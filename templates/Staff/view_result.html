@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}View Results - Staff Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title mb-0">View Results</h1>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+        {% if subjects %}
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Select Examination</label>
+                <select id="exam_id" class="form-select form-control-modern">
+                    <option value="">Select Examination</option>
+                    {% for exam in exams %}
+                    <option value="{{ exam.id }}">{{ exam.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Select Subject</label>
+                <select id="subject_id" class="form-select form-control-modern">
+                    <option value="">Select Subject</option>
+                    {% for subject in subjects %}
+                    <option value="{{ subject.id }}">{{ subject.name }} ({{ subject.course.name }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 text-end">
+                <button class="btn btn-primary btn-modern" id="fetch_result_btn">View Result</button>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-warning mb-0">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            No subjects are currently assigned to you.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="result_container" style="display:none;">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <h5 class="mb-3 gradient-text">Result List</h5>
+            <div class="table-responsive">
+                <table class="table table-hover" id="result_table">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>CE Marks</th>
+                            <th>TE Marks</th>
+                            <th>Total</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        $("#fetch_result_btn").click(function () {
+            var subject_id = $("#subject_id").val();
+            var exam_id = $("#exam_id").val();
+
+            if (!subject_id) {
+                alert("Please select a subject");
+                return;
+            }
+
+            $.ajax({
+                url: "{% url 'staff_get_result_data' %}",
+                type: 'POST',
+                data: { subject_id: subject_id, exam_id: exam_id },
+            })
+                .done(function (response) {
+                    var json_data = JSON.parse(response);
+                    var html = "";
+                    if (json_data.length > 0) {
+                        json_data.forEach(row => {
+                            html += `<tr>
+                            <td>${row.id}</td>
+                            <td>${row.name}</td>
+                            <td>${row.ce_marks}</td>
+                            <td>${row.te_marks}</td>
+                            <td>${row.total}</td>
+                            <td>${row.result_status}</td>
+                         </tr>`;
+                        });
+                        $("#result_table tbody").html(html);
+                        $("#result_container").show();
+                    } else {
+                        $("#result_table tbody").html("<tr><td colspan='6' class='text-center'>No Results Found</td></tr>");
+                        $("#result_container").show();
+                    }
+                })
+                .fail(function () {
+                    alert("Error fetching results.");
+                });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,20 @@
+<li><a href="{% url 'student_home' %}"
+                class="{% if request.resolver_match.url_name == 'student_home' %}active{% endif %}"><i
+                        class="fas fa-home"></i>
+                Dashboard</a></li>
+<li><a href="{% url 'student_view_attendance' %}"
+                class="{% if request.resolver_match.url_name == 'student_view_attendance' %}active{% endif %}"><i
+                        class="fas fa-calendar-alt"></i> View Attendance</a></li>
+<li><a href="{% url 'student_view_result' %}"
+                class="{% if request.resolver_match.url_name == 'student_view_result' %}active{% endif %}"><i
+                        class="fas fa-poll"></i> View Result</a></li>
+<li><a href="{% url 'student_apply_leave' %}"
+                class="{% if request.resolver_match.url_name == 'student_apply_leave' %}active{% endif %}"><i
+                        class="fas fa-envelope"></i> Apply Leave</a></li>
+<li><a href="{% url 'student_view_fees' %}"
+                class="{% if request.resolver_match.url_name == 'student_view_fees' %}active{% endif %}"><i
+                        class="fas fa-money-bill-wave"></i> My Fees</a></li>
+<li><a href="{% url 'student_feedback' %}"
+                class="{% if request.resolver_match.url_name == 'student_feedback' %}active{% endif %}"><i
+                        class="fas fa-comment"></i> Feedback</a></li>
+<li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>

@@ -1,0 +1,144 @@
+{% extends 'Staff/base_template.html' %}
+{% block page_title %}Analyze Results - Staff{% endblock %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Result Analysis</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Select Subject</label>
+                                    <select id="subject_id" class="form-control">
+                                        <option value="">Select Subject</option>
+                                        {% for subject in subjects %}
+                                        <option value="{{ subject.id }}">{{ subject.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Select Examination</label>
+                                    <select id="exam_id" class="form-control">
+                                        <option value="">All Examinations</option>
+                                        {% for exam in exams %}
+                                        <option value="{{ exam.id }}">{{ exam.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label>&nbsp;</label>
+                                <button class="btn btn-primary btn-block" id="analyze_btn">Analyze</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="analysis_container" style="display:none;">
+            <div class="col-md-6">
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">Grade Distribution</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="gradeChart"
+                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">Pass/Fail Ratio</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="passFailChart"
+                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}
+
+{% block custom_js %}
+<script>
+    $(document).ready(function () {
+        var gradeChart = null;
+        var passFailChart = null;
+
+        $("#analyze_btn").click(function () {
+            var subject_id = $("#subject_id").val();
+            var exam_id = $("#exam_id").val();
+
+            if (!subject_id) {
+                alert("Select Subject First");
+                return;
+            }
+
+            $.ajax({
+                url: "{% url 'staff_analyze_result' %}",
+                type: "POST",
+                data: {
+                    action: 'fetch_graph',
+                    subject_id: subject_id,
+                    exam_id: exam_id
+                }
+            })
+                .done(function (response) {
+                    var json_data = JSON.parse(response);
+
+                    // Show Container
+                    $("#analysis_container").show();
+
+                    // Destroy old charts if exist
+                    if (gradeChart) gradeChart.destroy();
+                    if (passFailChart) passFailChart.destroy();
+
+                    // Grade Chart (Bar/Pie)
+                    var ctx1 = document.getElementById('gradeChart').getContext('2d');
+                    gradeChart = new Chart(ctx1, {
+                        type: 'pie',
+                        data: {
+                            labels: json_data.grade_labels,
+                            datasets: [{
+                                label: 'Students',
+                                data: json_data.grade_counts,
+                                backgroundColor: [
+                                    '#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de', '#000000'
+                                ]
+                            }]
+                        }
+                    });
+
+                    // Pass/Fail Chart (Doughnut)
+                    var ctx2 = document.getElementById('passFailChart').getContext('2d');
+                    passFailChart = new Chart(ctx2, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Pass', 'Fail'],
+                            datasets: [{
+                                data: [json_data.pass_count, json_data.fail_count],
+                                backgroundColor: ['#00a65a', '#f56954']
+                            }]
+                        }
+                    });
+                })
+                .fail(function () {
+                    alert("Error fetching analysis data");
+                });
+        });
+    });
+</script>
+{% endblock custom_js %}

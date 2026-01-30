@@ -1,0 +1,77 @@
+﻿{% extends 'base.html' %}
+{# Fixed by Antigravity - Version 4 (Force Write) #}
+
+{% block title %}Edit Subject - HOD Dashboard{% endblock %}
+
+
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title mb-0">Edit Subject</h1>
+    <a href="{% url 'view_subjects' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Subject List
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="row g-3 mb-4">
+                <div class="col-12">
+                    <label class="form-label fw-bold">Subject Name <span class="text-danger">*</span></label>
+                    <input type="text" name="subject_name" class="form-control form-control-modern"
+                        value="{{ subject.name }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Course <span class="text-danger">*</span></label>
+                    <select name="course_id" class="form-select form-control-modern" required>
+                        <option value="">Select Course</option>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}" {% if course.id==subject.course.id %}selected{% endif %}>{{
+                            course.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Subject Type</label>
+                    <select name="subject_type_id" class="form-select form-control-modern">
+                        <option value="">Select Subject Type</option>
+                        {% for type in subject_types %}
+                        <option value="{{ type.id }}" {% if type.id==subject.subject_type.id %}selected{% endif %}>{{
+                            type.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Staff</label>
+                    <select name="staff_id" class="form-select form-control-modern">
+                        <option value="">Select Staff</option>
+                        {% for staff in staffs %}
+                        <option value="{{ staff.id }}" {% if staff.id==subject.staff.id %}selected{% endif %}>{{
+                            staff.admin.first_name }} {{ staff.admin.last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Max TE Marks</label>
+                    <input type="number" name="max_te_marks" class="form-control form-control-modern"
+                        value="{{ subject.max_te_marks }}" step="0.1">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Max CE Marks</label>
+                    <input type="number" name="max_ce_marks" class="form-control form-control-modern"
+                        value="{{ subject.max_ce_marks }}" step="0.1">
+                </div>
+            </div>
+
+            <div class="text-end mt-4">
+                <button type="submit" class="btn btn-modern btn-gradient-success">
+                    <i class="fas fa-save me-2"></i>Update Subject
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

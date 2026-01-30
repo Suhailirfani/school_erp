@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Staff - HOD Dashboard{% endblock %}
+
+
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title mb-0">Add New Staff</h1>
+    <a href="{% url 'view_staff' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Staff List
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <ul class="nav nav-tabs mb-4" id="uploadTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual"
+                    type="button" role="tab" aria-controls="manual" aria-selected="true">Manual Entry</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="bulk-tab" data-bs-toggle="tab" data-bs-target="#bulk" type="button"
+                    role="tab" aria-controls="bulk" aria-selected="false">Bulk Upload</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="uploadTabContent">
+            <!-- Manual Entry -->
+            <div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="manual">
+
+                    <h5 class="gradient-text mb-4">Personal Information</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">First Name <span class="text-danger">*</span></label>
+                            <input type="text" name="first_name" class="form-control form-control-modern" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Last Name <span class="text-danger">*</span></label>
+                            <input type="text" name="last_name" class="form-control form-control-modern" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Username <span class="text-danger">*</span></label>
+                            <input type="text" name="username" class="form-control form-control-modern" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email <span class="text-danger">*</span></label>
+                            <input type="email" name="email" class="form-control form-control-modern" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Password <span class="text-danger">*</span></label>
+                            <input type="password" name="password" class="form-control form-control-modern" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Gender <span class="text-danger">*</span></label>
+                            <select name="gender" class="form-select form-control-modern" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Address <span class="text-danger">*</span></label>
+                            <textarea name="address" class="form-control form-control-modern" rows="3"
+                                required></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Profile Picture</label>
+                            <input type="file" name="profile_pic" class="form-control form-control-modern"
+                                accept="image/*">
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-4">
+                        <button type="reset" class="btn btn-outline-secondary me-2">
+                            <i class="fas fa-redo me-2"></i>Reset
+                        </button>
+                        <button type="submit" class="btn btn-modern btn-gradient-success">
+                            <i class="fas fa-save me-2"></i>Add Staff
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Bulk Upload -->
+            <div class="tab-pane fade" id="bulk" role="tabpanel" aria-labelledby="bulk-tab">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="bulk_upload">
+
+                    <div class="alert alert-info border-0 shadow-sm mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle fa-2x"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="alert-heading text-dark">Instructions</h5>
+                                <p class="mb-1 text-dark">Please upload an Excel file (.xlsx) with the following
+                                    headers:</p>
+                                <small class="text-dark">First Name, Last Name, Username, Email, Password, Gender,
+                                    Address</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <a href="{% url 'download_sample_file' 'staff' %}" class="btn btn-sm btn-dark">
+                            <i class="fas fa-download me-2"></i>Download Sample Template
+                        </a>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Upload Excel File <span class="text-danger">*</span></label>
+                        <input type="file" name="excel_file" class="form-control form-control-modern" accept=".xlsx"
+                            required>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-modern btn-gradient-primary">
+                            <i class="fas fa-upload me-2"></i>Upload Staff
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

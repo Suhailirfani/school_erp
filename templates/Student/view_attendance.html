@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}View Attendance - Student{% endblock %}
+
+
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title mb-0">View Attendance</h1>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+        <form action="{% url 'student_view_attendance_post' %}" method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Subject (Optional)</label>
+                    <select name="subject" class="form-select form-control-modern">
+                        <option value="">All Subjects</option>
+                        {% for subject in subjects %}
+                        <option value="{{ subject.id }}">{{ subject.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Filter Type</label>
+                    <select name="filter_type" id="filter_type" class="form-select form-control-modern" required>
+                        <option value="day">Single Date</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="month">Month</option>
+                        <option value="year">Year</option>
+                        <option value="range">Date Range</option>
+                        <option value="till_today">Till Today</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4" id="div_date_val">
+                    <label class="form-label fw-bold">Date</label>
+                    <input type="date" name="date_val" class="form-control form-control-modern">
+                </div>
+
+                <div class="col-md-4" id="div_month" style="display:none;">
+                    <label class="form-label fw-bold">Month</label>
+                    <div class="d-flex gap-2">
+                        <select name="month" class="form-select form-control-modern">
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                        <input type="number" name="year" class="form-control form-control-modern" placeholder="Year"
+                            value="{% now 'Y' %}">
+                    </div>
+                </div>
+
+                <div class="col-md-4" id="div_year" style="display:none;">
+                    <label class="form-label fw-bold">Year</label>
+                    <input type="number" name="year" class="form-control form-control-modern" placeholder="Year"
+                        value="{% now 'Y' %}">
+                </div>
+
+                <div class="col-md-4" id="div_range" style="display:none;">
+                    <label class="form-label fw-bold">Range</label>
+                    <div class="input-group">
+                        <input type="date" name="start_date" class="form-control form-control-modern"
+                            placeholder="Start">
+                        <span class="input-group-text">to</span>
+                        <input type="date" name="end_date" class="form-control form-control-modern" placeholder="End">
+                    </div>
+                </div>
+            </div>
+            <div class="text-end mt-3">
+                <button type="submit" class="btn btn-modern btn-gradient-primary">Fetch Attendance</button>
+            </div>
+        </form>
+
+        <script>
+            document.getElementById('filter_type').addEventListener('change', function () {
+                var type = this.value;
+                document.getElementById('div_date_val').style.display = 'none';
+                document.getElementById('div_month').style.display = 'none';
+                document.getElementById('div_year').style.display = 'none';
+                document.getElementById('div_range').style.display = 'none';
+
+                if (type === 'day' || type === 'weekly') {
+                    document.getElementById('div_date_val').style.display = 'block';
+                } else if (type === 'month') {
+                    document.getElementById('div_month').style.display = 'block';
+                } else if (type === 'year') {
+                    document.getElementById('div_year').style.display = 'block';
+                } else if (type === 'range') {
+                    document.getElementById('div_range').style.display = 'block';
+                }
+            });
+        </script>
+    </div>
+</div>
+
+{% if attendance_reports %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent border-0">
+        <h5 class="mb-0">Attendance Report for {{ subject.name }}</h5>
+    </div>
+    <div class="card-body p-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Subject</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in attendance_reports %}
+                    <tr>
+                        <td>{{ report.attendance.attendance_date }}</td>
+                        <td>{{ report.attendance.subject.name }}</td> {# Warning: check if Subject is directly on
+                        Attendance or Course #}
+                        <td>
+                            {% if report.status %}
+                            <span class="badge bg-success">Present</span>
+                            {% else %}
+                            <span class="badge bg-danger">Absent</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

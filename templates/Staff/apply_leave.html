@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Apply Leave - Staff{% endblock %}
+
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title mb-0">Apply Leave</h1>
+    <button type="button" class="btn btn-modern btn-gradient-primary" data-bs-toggle="modal"
+        data-bs-target="#applyLeaveModal">
+        <i class="fas fa-plus"></i> Apply Leave
+    </button>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="applyLeaveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Apply for Leave</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'staff_apply_leave_save' %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Leave Date</label>
+                        <input type="date" name="leave_date" class="form-control form-control-modern" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Reason</label>
+                        <textarea name="leave_msg" class="form-control form-control-modern" rows="4" required
+                            placeholder="Enter your reason here..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-modern btn-gradient-primary">Apply Leave</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent border-0">
+        <h5 class="mb-0">Leave History</h5>
+    </div>
+    <div class="card-body p-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Message</th>
+                        <th>Admin Reply</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for leave in leave_data %}
+                    <tr>
+                        <td>{{ leave.id }}</td>
+                        <td>{{ leave.leave_date }}</td>
+                        <td>{{ leave.leave_message }}</td>
+                        <td>{{ leave.admin_remark|default:"-" }}</td>
+                        <td>
+                            {% if leave.status == 0 %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif leave.status == 1 %}
+                            <span class="badge bg-success">Approved</span>
+                            {% else %}
+                            <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No leave history found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

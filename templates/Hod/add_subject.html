@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Subject - HOD Dashboard{% endblock %}
+
+
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title mb-0">Add New Subject</h1>
+    <a href="{% url 'view_subjects' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Subject List
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <ul class="nav nav-tabs mb-4" id="uploadTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual"
+                    type="button" role="tab" aria-controls="manual" aria-selected="true">Manual Entry</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="bulk-tab" data-bs-toggle="tab" data-bs-target="#bulk" type="button"
+                    role="tab" aria-controls="bulk" aria-selected="false">Bulk Upload</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="uploadTabContent">
+            <!-- Manual Entry -->
+            <div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="manual">
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Subject Name <span class="text-danger">*</span></label>
+                            <input type="text" name="subject_name" class="form-control form-control-modern" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Course <span class="text-danger">*</span></label>
+                            <select name="course_id" class="form-select form-control-modern" required>
+                                <option value="">Select Course</option>
+                                {% for course in courses %}
+                                <option value="{{ course.id }}">{{ course.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Subject Type</label>
+                            <select name="subject_type_id" class="form-select form-control-modern">
+                                <option value="">Select Subject Type</option>
+                                {% for type in subject_types %}
+                                <option value="{{ type.id }}">{{ type.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Staff</label>
+                            <select name="staff_id" class="form-select form-control-modern">
+                                <option value="">Select Staff</option>
+                                {% for staff in staffs %}
+                                <option value="{{ staff.id }}">{{ staff.admin.first_name }} {{ staff.admin.last_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Max TE Marks</label>
+                            <input type="number" name="max_te_marks" class="form-control form-control-modern"
+                                value="100" step="0.1">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Max CE Marks</label>
+                            <input type="number" name="max_ce_marks" class="form-control form-control-modern"
+                                value="100" step="0.1">
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-4">
+                        <button type="submit" class="btn btn-modern btn-gradient-success">
+                            <i class="fas fa-save me-2"></i>Add Subject
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Bulk Upload -->
+            <div class="tab-pane fade" id="bulk" role="tabpanel" aria-labelledby="bulk-tab">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="bulk_upload">
+
+                    <div class="alert alert-info border-0 shadow-sm mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle fa-2x"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="alert-heading text-dark">Instructions</h5>
+                                <p class="mb-1 text-dark">Please upload an Excel file (.xlsx) with the following
+                                    headers (order matters):</p>
+                                <small class="text-dark">Subject Name, Course Name, Staff Email (Optional)</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <!-- Optional: Add sample download link if we had one implemented for subjects -->
+                        <!-- <a href="#" class="btn btn-sm btn-dark">
+                            <i class="fas fa-download me-2"></i>Download Sample Template
+                        </a> -->
+                        <p class="mb-0 small"><strong>Note:</strong> Course Name must match exactly with existing
+                            courses. Subject Type (Optional) - leave blank for None.</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Upload Excel File <span class="text-danger">*</span></label>
+                        <input type="file" name="subject_file" class="form-control form-control-modern" accept=".xlsx"
+                            required>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-modern btn-gradient-primary">
+                            <i class="fas fa-upload me-2"></i>Upload Subjects
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

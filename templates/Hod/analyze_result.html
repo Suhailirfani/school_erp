@@ -1,0 +1,180 @@
+{% extends 'Hod/base_template.html' %}
+{% block page_title %}Analyze Results - HOD{% endblock %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Result Analysis</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Select Course</label>
+                                    <select id="course_id" class="form-control">
+                                        <option value="">Select Course</option>
+                                        {% for course in courses %}
+                                        <option value="{{ course.id }}">{{ course.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Select Examination</label>
+                                    <select id="exam_id" class="form-control">
+                                        <option value="">All Examinations</option>
+                                        {% for exam in exams %}
+                                        <option value="{{ exam.id }}">{{ exam.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Select Subject Type</label>
+                                    <select id="subject_type_id" class="form-control">
+                                        <option value="">All Types</option>
+                                        {% for type in subject_types %}
+                                        <option value="{{ type.id }}">{{ type.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <label>&nbsp;</label>
+                                <button class="btn btn-primary btn-block" id="analyze_btn">Analyze</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="analysis_container" style="display:none;">
+            <div class="col-md-6">
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">Subject-wise Pass Percentage</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="passChart"
+                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">Subject-wise Average Marks (%)</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="avgChart"
+                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}
+
+{% block custom_js %}
+<script>
+    $(document).ready(function () {
+        var passChart = null;
+        var avgChart = null;
+
+        $("#analyze_btn").click(function () {
+            var course_id = $("#course_id").val();
+            var exam_id = $("#exam_id").val();
+            var subject_type_id = $("#subject_type_id").val();
+
+            if (!course_id) {
+                alert("Select Course First");
+                return;
+            }
+
+            $.ajax({
+                url: "{% url 'admin_analyze_result' %}",
+                type: "POST",
+                data: {
+                    action: 'fetch_graph',
+                    course_id: course_id,
+                    exam_id: exam_id,
+                    subject_type_id: subject_type_id
+                }
+            })
+                .done(function (response) {
+                    var json_data = JSON.parse(response);
+
+                    // Show Container
+                    $("#analysis_container").show();
+
+                    // Destroy old charts if exist
+                    if (passChart) passChart.destroy();
+                    if (avgChart) avgChart.destroy();
+
+                    // Pass Percentage Chart
+                    var ctx1 = document.getElementById('passChart').getContext('2d');
+                    passChart = new Chart(ctx1, {
+                        type: 'bar',
+                        data: {
+                            labels: json_data.labels,
+                            datasets: [{
+                                label: 'Pass Percentage',
+                                data: json_data.pass_percentages,
+                                backgroundColor: 'rgba(60, 186, 159, 0.5)',
+                                borderColor: 'rgba(60, 186, 159, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true,
+                                        max: 100
+                                    }
+                                }]
+                            }
+                        }
+                    });
+
+                    // Average Marks Chart
+                    var ctx2 = document.getElementById('avgChart').getContext('2d');
+                    avgChart = new Chart(ctx2, {
+                        type: 'bar',
+                        data: {
+                            labels: json_data.labels,
+                            datasets: [{
+                                label: 'Average Score (%)',
+                                data: json_data.avg_marks,
+                                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true,
+                                        max: 100
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                })
+                .fail(function () {
+                    alert("Error fetching analysis data");
+                });
+        });
+    });
+</script>
+{% endblock custom_js %}

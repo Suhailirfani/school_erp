@@ -1,0 +1,445 @@
+{% extends 'base.html' %}
+
+{% block title %}View Attendance - Staff Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title mb-0">View Attendance</h1>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+        <ul class="nav nav-tabs mb-4" id="reportTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="class-report-tab" data-bs-toggle="tab"
+                    data-bs-target="#class-report" type="button" role="tab" aria-controls="class-report"
+                    aria-selected="true">Class Report</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="student-report-tab" data-bs-toggle="tab" data-bs-target="#student-report"
+                    type="button" role="tab" aria-controls="student-report" aria-selected="false">Student
+                    Report</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis" type="button"
+                    role="tab" aria-controls="analysis" aria-selected="false">Analysis</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="reportTabContent">
+
+            <!-- CLASS REPORT TAB -->
+            <div class="tab-pane fade show active" id="class-report" role="tabpanel">
+                <div class="row g-3 items-end">
+                    <!-- Course Select -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Course</label>
+                        <select id="cr_course" class="form-select form-control-modern">
+                            <option value="">All Courses</option>
+                            {% for course in courses %}
+                            <option value="{{ course.id }}">{{ course.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Filter Type -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Filter By</label>
+                        <select id="cr_filter_type" class="form-select form-control-modern">
+                            <option value="day">Single Date</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="month">Month</option>
+                            <option value="year">Year</option>
+                            <option value="range">Date Range</option>
+                            <option value="till_today">Till Today</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter Inputs (Dynamic) -->
+                    <div class="col-md-5" id="cr_filter_inputs">
+                        <!-- Default: Single Date -->
+                        <div id="filter_day" class="filter-group">
+                            <label class="form-label fw-bold">Date</label>
+                            <input type="date" id="cr_date" class="form-control form-control-modern"
+                                value="{% now 'Y-m-d' %}">
+                        </div>
+
+                        <!-- Month -->
+                        <div id="filter_month" class="filter-group" style="display:none;">
+                            <label class="form-label fw-bold">Month & Year</label>
+                            <div class="d-flex gap-2">
+                                <select id="cr_month" class="form-select form-control-modern">
+                                    <option value="1">January</option>
+                                    <option value="2">February</option>
+                                    <option value="3">March</option>
+                                    <option value="4">April</option>
+                                    <option value="5">May</option>
+                                    <option value="6">June</option>
+                                    <option value="7">July</option>
+                                    <option value="8">August</option>
+                                    <option value="9">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                                <input type="number" id="cr_year_month" class="form-control form-control-modern"
+                                    placeholder="Year" value="{% now 'Y' %}">
+                            </div>
+                        </div>
+
+                        <!-- Year -->
+                        <div id="filter_year" class="filter-group" style="display:none;">
+                            <label class="form-label fw-bold">Year</label>
+                            <input type="number" id="cr_year" class="form-control form-control-modern"
+                                value="{% now 'Y' %}">
+                        </div>
+
+                        <!-- Range -->
+                        <div id="filter_range" class="filter-group" style="display:none;">
+                            <label class="form-label fw-bold">From - To</label>
+                            <div class="input-group">
+                                <input type="date" id="cr_start_date" class="form-control form-control-modern">
+                                <span class="input-group-text">to</span>
+                                <input type="date" id="cr_end_date" class="form-control form-control-modern">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button class="btn btn-primary btn-modern" id="cr_fetch_btn">View Report</button>
+                </div>
+
+                <!-- Report Container -->
+                <div id="cr_report_container" class="mt-4" style="display:none;">
+                    <!-- Results will be loaded here -->
+                </div>
+            </div>
+
+            <!-- STUDENT REPORT TAB -->
+            <div class="tab-pane fade" id="student-report" role="tabpanel">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Search Student</label>
+                        <select id="sr_student_id" class="form-select form-control-modern">
+                            <option value="">Select Student</option>
+                            {% for student in students %}
+                            <option value="{{ student.admin.id }}">{{ student.admin.first_name }} {{student.admin.last_name }} ({{ student.course_id.name }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Date Range (Optional)</label>
+                        <div class="input-group">
+                            <input type="date" id="sr_start_date" class="form-control form-control-modern">
+                            <span class="input-group-text">to</span>
+                            <input type="date" id="sr_end_date" class="form-control form-control-modern">
+                        </div>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-primary btn-modern w-100" id="sr_fetch_btn">View History</button>
+                    </div>
+                </div>
+
+                <div id="sr_report_container" class="mt-4" style="display:none;">
+                    <h5 class="mb-3 gradient-text">Attendance History</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="sr_table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Leave Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANALYSIS TAB -->
+            <div class="tab-pane fade" id="analysis" role="tabpanel">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Course</label>
+                        <select id="an_course" class="form-select form-control-modern">
+                            <option value="">All Courses</option>
+                            {% for course in courses %}
+                            <option value="{{ course.id }}">{{ course.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Analysis Type</label>
+                        <select id="an_type" class="form-select form-control-modern">
+                            <option value="below">Exam Eligibility (Below %)</option>
+                            <option value="above">Awards/Merit (Above %)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold">Threshold (%)</label>
+                        <input type="number" id="an_threshold" class="form-control form-control-modern" value="75"
+                            min="0" max="100">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Date Range (Optional)</label>
+                        <div class="input-group">
+                            <input type="date" id="an_start_date" class="form-control form-control-modern">
+                            <!-- <span class="input-group-text">-</span> -->
+                            <input type="date" id="an_end_date" class="form-control form-control-modern">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button class="btn btn-primary btn-modern" id="an_fetch_btn">Analyze</button>
+                </div>
+
+                <div id="an_report_container" class="mt-4" style="display:none;">
+                    <!-- Results Loaded Here -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+
+        // ========================
+        // CLASS REPORT SCRIPTS
+        // ========================
+
+        // Toggle Filter Inputs
+        $("#cr_filter_type").change(function () {
+            var type = $(this).val();
+            $(".filter-group").hide();
+            if (type == "day") $("#filter_day").show();
+            else if (type == "month") $("#filter_month").show();
+            else if (type == "year") $("#filter_year").show();
+            else if (type == "range") $("#filter_range").show();
+            else if (type == "weekly") $("#filter_day").show();
+            else if (type == "till_today") { /* No inputs needed */ }
+        });
+
+        // Set current month in selector
+        var d = new Date();
+        $("#cr_month").val(d.getMonth() + 1);
+
+        // Fetch Report
+        $("#cr_fetch_btn").click(function () {
+            var course = $("#cr_course").val();
+            var filter = $("#cr_filter_type").val();
+
+            // Prepare Data
+            var data = {
+                course_id: course,
+                filter_type: filter,
+                start_date: "",
+                end_date: "",
+                month: "",
+                year: ""
+            };
+
+            if (filter == "day" || filter == "weekly") {
+                data.start_date = $("#cr_date").val();
+            } else if (filter == "month") {
+                data.month = $("#cr_month").val();
+                data.year = $("#cr_year_month").val();
+            } else if (filter == "year") {
+                data.year = $("#cr_year").val();
+            } else if (filter == "range") {
+                data.start_date = $("#cr_start_date").val();
+                data.end_date = $("#cr_end_date").val();
+            }
+
+            // Call AJAX
+            $.ajax({
+                url: "{% url 'staff_get_attendance_data' %}",
+                type: 'POST',
+                data: data,
+            })
+                .done(function (json_response) {
+                    var response = JSON.parse(json_response);
+                    var html = "";
+
+                    if (response.length > 0) {
+                        response.forEach(courseGroup => {
+                            html += `<h5 class="mt-4 mb-2 text-primary border-bottom pb-2">${courseGroup.course_name}</h5>`;
+
+                            if (courseGroup.data.length > 0) {
+                                html += `<div class="table-responsive"><table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Student Name</th>
+                                            <th>Total Days</th>
+                                            <th>Present</th>
+                                            <th>Absent</th>
+                                            <th>Percentage</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+
+                                courseGroup.data.forEach(row => {
+                                    var status_badge = "";
+                                    if (row.percentage >= 75) status_badge = "<span class='badge bg-success'>Good</span>";
+                                    else if (row.percentage >= 50) status_badge = "<span class='badge bg-warning text-dark'>Average</span>";
+                                    else status_badge = "<span class='badge bg-danger'>Low</span>";
+
+                                    html += `<tr>
+                                    <td>${row.name}</td>
+                                    <td>${row.total_days}</td>
+                                    <td>${row.present}</td>
+                                    <td>${row.absent}</td>
+                                    <td>${row.percentage}%</td>
+                                    <td>${status_badge}</td>
+                                    </tr>`;
+                                });
+                                html += `</tbody></table></div>`;
+                            } else {
+                                html += `<p class="text-muted">No attendance data found for this period.</p>`;
+                            }
+                        });
+                        $("#cr_report_container").html(html);
+                        $("#cr_report_container").show();
+                    } else {
+                        $("#cr_report_container").html("<div class='alert alert-info'>No Data Found</div>");
+                        $("#cr_report_container").show();
+                    }
+                })
+                .fail(function () {
+                    alert("Error fetching report data.");
+                });
+        });
+
+
+        // ========================
+        // STUDENT REPORT SCRIPTS
+        // ========================
+        $("#sr_fetch_btn").click(function () {
+            var student_id = $("#sr_student_id").val();
+            if (!student_id) {
+                alert("Please select a student");
+                return;
+            }
+
+            var start_date = $("#sr_start_date").val();
+            var end_date = $("#sr_end_date").val();
+
+            $.ajax({
+                url: "{% url 'staff_get_student_attendance_data' %}",
+                type: 'POST',
+                data: {
+                    student_id: student_id,
+                    start_date: start_date,
+                    end_date: end_date
+                },
+            })
+                .done(function (json_response) {
+                    var response = JSON.parse(json_response);
+                    var html = "";
+                    if (response.length > 0) {
+                        response.forEach(row => {
+                            var status_badge = row.status == "Present" ? "<span class='badge bg-success'>Present</span>" : "<span class='badge bg-danger'>Absent</span>";
+                            html += `<tr>
+                            <td>${row.date}</td>
+                            <td>${status_badge}</td>
+                            <td>${row.leave_status}</td>
+                        </tr>`;
+                        });
+                        $("#sr_table tbody").html(html);
+                        $("#sr_report_container").show();
+                    } else {
+                        $("#sr_table tbody").html("<tr><td colspan='3' class='text-center'>No Records Found</td></tr>");
+                        $("#sr_report_container").show();
+                    }
+                })
+                .fail(function () {
+                    alert("Error fetching student history.");
+                });
+        });
+
+        // ========================
+        // ANALYSIS SCRIPTS
+        // ========================
+        $("#an_fetch_btn").click(function () {
+            var course_id = $("#an_course").val();
+            var analysis_type = $("#an_type").val();
+            var threshold = $("#an_threshold").val();
+
+            var data = {
+                course_id: course_id,
+                analysis_type: analysis_type,
+                threshold: threshold,
+                start_date: $("#an_start_date").val(),
+                end_date: $("#an_end_date").val()
+            };
+
+            $.ajax({
+                url: "{% url 'staff_analyze_attendance' %}",
+                type: 'POST',
+                data: data,
+            })
+                .done(function (json_response) {
+                    var response = JSON.parse(json_response);
+                    var html = "";
+
+                    if (response.length > 0) {
+                        response.forEach(courseGroup => {
+                            html += `<h5 class="mt-4 mb-2 text-primary border-bottom pb-2">${courseGroup.course_name}</h5>`;
+
+                            if (courseGroup.data.length > 0) {
+                                html += `<div class="table-responsive"><table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Student Name</th>
+                                            <th>Total Days</th>
+                                            <th>Present</th>
+                                            <th>Percentage</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+
+                                courseGroup.data.forEach(row => {
+                                    var badge_class = "bg-primary";
+                                    if (analysis_type == 'below') badge_class = "bg-danger";
+                                    else if (analysis_type == 'above') badge_class = "bg-success";
+
+                                    html += `<tr>
+                                    <td>${row.name}</td>
+                                    <td>${row.total_days}</td>
+                                    <td>${row.present}</td>
+                                    <td><strong>${row.percentage}%</strong></td>
+                                    <td><span class='badge ${badge_class}'>${row.status}</span></td>
+                                    </tr>`;
+                                });
+                                html += `</tbody></table></div>`;
+                            } else {
+                                html += `<p class="text-muted">No students matching criteria in this course.</p>`;
+                            }
+                        });
+                        $("#an_report_container").html(html);
+                        $("#an_report_container").show();
+                    } else {
+                        $("#an_report_container").html("<div class='alert alert-info'>No Data Found</div>");
+                        $("#an_report_container").show();
+                    }
+                })
+                .fail(function () {
+                    alert("Error analyzing attendance.");
+                });
+        });
+
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,51 @@
+<li><a href="{% url 'hod_dashboard' %}"
+                class="{% if request.resolver_match.url_name == 'hod_dashboard' %}active{% endif %}"><i
+                        class="fas fa-home"></i>
+                Dashboard</a></li>
+<li><a href="{% url 'view_students' %}"
+                class="{% if request.resolver_match.url_name == 'view_students' %}active{% endif %}"><i
+                        class="fas fa-user-graduate"></i> Students</a></li>
+<li><a href="{% url 'view_staff' %}"
+                class="{% if request.resolver_match.url_name == 'view_staff' %}active{% endif %}"><i
+                        class="fas fa-chalkboard-teacher"></i> Staff</a></li>
+<li><a href="{% url 'view_courses' %}"
+                class="{% if request.resolver_match.url_name == 'view_courses' %}active{% endif %}"><i
+                        class="fas fa-book"></i>
+                Courses</a></li>
+<li><a href="{% url 'view_subjects' %}"
+                class="{% if request.resolver_match.url_name == 'view_subjects' %}active{% endif %}"><i
+                        class="fas fa-book-open"></i> Subjects</a></li>
+<li><a href="{% url 'manage_subject_type' %}"
+                class="{% if request.resolver_match.url_name == 'manage_subject_type' %}active{% endif %}"><i
+                        class="fas fa-tags"></i> Subject Types</a></li>
+
+<li><a href="{% url 'admin_view_attendance' %}"
+                class="{% if request.resolver_match.url_name == 'admin_view_attendance' %}active{% endif %}"><i
+                        class="fas fa-clipboard-check"></i> Attendance</a></li>
+
+<li><a href="{% url 'manage_exam' %}"
+                class="{% if request.resolver_match.url_name == 'manage_exam' %}active{% endif %}"><i
+                        class="fas fa-edit"></i> Manage Exams</a></li>
+<li><a href="{% url 'add_result' %}"
+                class="{% if request.resolver_match.url_name == 'add_result' %}active{% endif %}"><i
+                        class="fas fa-plus-circle"></i> Add Results</a></li>
+<li><a href="{% url 'admin_view_result' %}"
+                class="{% if request.resolver_match.url_name == 'admin_view_result' %}active{% endif %}"><i
+                        class="fas fa-chart-bar"></i> View Results</a></li>
+<li><a href="#"><i class="fas fa-bell"></i> Notifications</a></li>
+
+<li><a href="{% url 'admin_view_student_leave' %}"
+                class="{% if request.resolver_match.url_name == 'admin_view_student_leave' %}active{% endif %}"><i
+                        class="fas fa-envelope-open-text"></i> Student Leave</a></li>
+<li><a href="{% url 'admin_view_staff_leave' %}"
+                class="{% if request.resolver_match.url_name == 'admin_view_staff_leave' %}active{% endif %}"><i
+                        class="fas fa-envelope"></i> Staff Leave</a></li>
+<li><a href="{% url 'admin_view_student_feedback' %}"
+                class="{% if request.resolver_match.url_name == 'admin_view_student_feedback' %}active{% endif %}"><i
+                        class="fas fa-comments"></i> Student Feedback</a></li>
+<li><a href="{% url 'admin_view_staff_feedback' %}"
+                class="{% if request.resolver_match.url_name == 'admin_view_staff_feedback' %}active{% endif %}"><i
+                        class="fas fa-comment-dots"></i> Staff Feedback</a></li>
+<li><a href="{% url 'manage_expense' %}"><i class="fas fa-rupee-sign"></i> Accounts</a></li>
+<li><a href="#"><i class="fas fa-question-circle"></i> Enquiries</a></li>
+<li><a href="#"><i class="fas fa-newspaper"></i> News</a></li>

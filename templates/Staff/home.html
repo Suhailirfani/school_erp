@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Staff Dashboard{% endblock %}
+
+
+
+{% block content %}
+<div class="row">
+    <!-- Stats Cards -->
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-info p-3 mb-3 rounded text-white text-center shadow">
+            <div class="inner">
+                <h3>150</h3>
+                <p>Students under you</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-user-graduate" style="font-size: 3rem; opacity: 0.5;"></i>
+            </div>
+            <a href="#" class="small-box-footer text-white text-decoration-none">More info <i
+                    class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-success p-3 mb-3 rounded text-white text-center shadow">
+            <div class="inner">
+                <h3>5</h3>
+                <p>Attendance Taken</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-chart-bar" style="font-size: 3rem; opacity: 0.5;"></i>
+            </div>
+            <a href="#" class="small-box-footer text-white text-decoration-none">More info <i
+                    class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-warning p-3 mb-3 rounded text-white text-center shadow">
+            <div class="inner">
+                <h3>2</h3>
+                <p>Subject Handling</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-book" style="font-size: 3rem; opacity: 0.5;"></i>
+            </div>
+            <a href="#" class="small-box-footer text-white text-decoration-none">More info <i
+                    class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-danger p-3 mb-3 rounded text-white text-center shadow">
+            <div class="inner">
+                <h3>15</h3>
+                <p>Total Leave Taken</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-user-times" style="font-size: 3rem; opacity: 0.5;"></i>
+            </div>
+            <a href="#" class="small-box-footer text-white text-decoration-none">More info <i
+                    class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+</div>
+{% endblock %}

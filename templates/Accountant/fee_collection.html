@@ -1,0 +1,135 @@
+{% extends 'Accountant/base_template.html' %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Search Section -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">Search Student</h3>
+                    </div>
+                    <form method="GET">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Student</label>
+                                <select class="form-control select2" name="student_id" required
+                                    onchange="this.form.submit()">
+                                    <option value="">Select Student</option>
+                                    {% for student in students %}
+                                    <option value="{{ student.admin.id }}" {% if selected_student.admin.id == student.admin.id %}selected{% endif %}>
+                                        {{ student.admin.first_name }} {{ student.admin.last_name }} ({{student.course_id.name }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {% if selected_student %}
+        <div class="row">
+            <!-- Balances Card -->
+            <div class="col-md-4">
+                <div class="infos-card card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">Balances</h3>
+                    </div>
+                    <div class="card-body">
+                        <h5>Advance Balance: <span class="badge badge-success">{{ selected_student.advance_balance }}</span></h5>
+                    </div>
+                </div>
+
+                <div class="card card-primary mt-3">
+                    <div class="card-header">
+                        <h3 class="card-title">Make Payment</h3>
+                    </div>
+                    <form action="{% url 'fee_collection' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="student_id" value="{{ selected_student.admin.id }}">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Amount</label>
+                                <input type="number" step="0.01" class="form-control" name="amount_paid" required>
+                                <small class="text-muted">Will be allocated to oldest dues first.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Mode</label>
+                                <select class="form-control" name="payment_mode">
+                                    <option value="Cash">Cash</option>
+                                    <option value="UPI">UPI</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Remark</label>
+                                <input type="text" class="form-control" name="remark">
+                            </div>
+                            <button type="submit" name="pay_fee" class="btn btn-success btn-block">Pay Now</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Invoices List -->
+            <div class="col-md-8">
+                <div class="card card-warning">
+                    <div class="card-header">
+                        <h3 class="card-title">Fee Status for {{ selected_student.admin.first_name }}</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Fee Head</th>
+                                    <th>Total</th>
+                                    <th>Paid</th>
+                                    <th>Balance</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for invoice in invoices %}
+                                <tr>
+                                    <td>{{ invoice.fee_head.name }}</td>
+                                    <td>{{ invoice.amount }}</td>
+                                    <td>{{ invoice.paid_amount }}</td>
+                                    <td>
+                                        <script>document.write({{ invoice.amount }} - {{ invoice.paid_amount }})</script>
+                                    </td>
+                                    <td>
+                                        {% if invoice.is_paid %}
+                                        <span class="badge badge-success">Paid</span>
+                                        {% else %}
+                                        <span class="badge badge-danger">Unpaid</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No invoices found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if messages %}
+        <div class="row">
+            <div class="col-md-12">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock main_content %}

@@ -1,0 +1,46 @@
+{% extends 'Accountant/base_template.html' %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Manage Expenses</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Head</th>
+                                    <th>Amount</th>
+                                    <th>Description</th>
+                                    <th>Added By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for expense in expenses %}
+                                <tr>
+                                    <td>{{ expense.date }}</td>
+                                    <td>{{ expense.head.name }}</td>
+                                    <td>{{ expense.amount }}</td>
+                                    <td>{{ expense.description }}</td>
+                                    <td>{{ expense.added_by.first_name }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <a href="{% url 'add_expense' %}" class="btn btn-primary btn-block">Add Expense</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}

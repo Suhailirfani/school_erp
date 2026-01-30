@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Staff Leave Requests{% endblock %}
+
+
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title mb-0">Staff Leave Requests</h1>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Staff Name</th>
+                        <th>Leave Date</th>
+                        <th>Message</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for leave in leaves %}
+                    <tr>
+                        <td>{{ leave.id }}</td>
+                        <td>{{ leave.staff.admin.first_name }} {{ leave.staff.admin.last_name }}</td>
+                        <td>{{ leave.leave_date }}</td>
+                        <td>{{ leave.leave_message }}</td>
+                        <td>
+                            {% if leave.status == 0 %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif leave.status == 1 %}
+                            <span class="badge bg-success">Approved</span>
+                            {% else %}
+                            <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if leave.status == 0 %}
+                            <button class="btn btn-success btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#approveModal{{ leave.id }}">Approve</button>
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#rejectModal{{ leave.id }}">Reject</button>
+                            {% else %}
+                            <button class="btn btn-secondary btn-sm" disabled>Processed</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <!-- Approve Modal -->
+                    <div class="modal fade" id="approveModal{{ leave.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Approve Leave</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <form action="{% url 'admin_approve_staff_leave' leave.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to approve this leave?</p>
+                                        <div class="form-group">
+                                            <label>Admin Remark (Optional)</label>
+                                            <textarea class="form-control" name="admin_remark" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-success">Approve</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reject Modal -->
+                    <div class="modal fade" id="rejectModal{{ leave.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Reject Leave</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <form action="{% url 'admin_disapprove_staff_leave' leave.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to reject this leave?</p>
+                                        <div class="form-group">
+                                            <label>Admin Remark (Optional)</label>
+                                            <textarea class="form-control" name="admin_remark" rows="3"
+                                                required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-danger">Reject</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">No Leave Requests Found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'Accountant/base_template.html' %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Manage Fee Structures</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Fee Head</th>
+                                    <th>Amount</th>
+                                    <th>Installments</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for structure in structures %}
+                                <tr>
+                                    <td>{{ structure.course.name }}</td>
+                                    <td>{{ structure.fee_head.name }}</td>
+                                    <td>{{ structure.amount }}</td>
+                                    <td>{{ structure.installments }}</td>
+                                    <td>
+                                        <a href="{% url 'edit_fee_structure' structure.id %}"
+                                            class="btn btn-sm btn-primary">Edit</a>
+                                        <a href="{% url 'delete_fee_structure' structure.id %}"
+                                            class="btn btn-sm btn-danger">Delete</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <a href="{% url 'add_fee_structure' %}" class="btn btn-primary btn-block">Add Fee Structure</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}

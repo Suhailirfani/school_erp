@@ -1,0 +1,46 @@
+{% extends 'Accountant/base_template.html' %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Manage Incomes</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Source</th>
+                                    <th>Amount</th>
+                                    <th>Description</th>
+                                    <th>Added By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for income in incomes %}
+                                <tr>
+                                    <td>{{ income.date }}</td>
+                                    <td>{{ income.source }}</td>
+                                    <td>{{ income.amount }}</td>
+                                    <td>{{ income.description }}</td>
+                                    <td>{{ income.added_by.first_name }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <a href="{% url 'add_income' %}" class="btn btn-primary btn-block">Add Income</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}

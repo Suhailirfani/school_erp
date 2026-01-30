@@ -1,0 +1,52 @@
+{% extends 'Accountant/base_template.html' %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Edit Fee Structure</h3>
+                    </div>
+                    <form action="{% url 'edit_fee_structure' structure.id %}" method="POST">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Course</label>
+                                <input type="text" class="form-control" value="{{ structure.course.name }}" disabled>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Fee Head</label>
+                                <input type="text" class="form-control" value="{{ structure.fee_head.name }}" disabled>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Amount (Total)</label>
+                                <input type="number" step="0.01" class="form-control" name="amount"
+                                    value="{{ structure.amount }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Installments</label>
+                                <input type="number" class="form-control" name="installments"
+                                    value="{{ structure.installments }}" min="1" required>
+                            </div>
+
+                            {% if messages %}
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary btn-block">Update Fee Structure</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}

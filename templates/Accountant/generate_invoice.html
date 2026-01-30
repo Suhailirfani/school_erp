@@ -1,0 +1,42 @@
+{% extends 'Accountant/base_template.html' %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Generate Invoices</h3>
+                    </div>
+                    <form action="{% url 'generate_invoice' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Course</label>
+                                <select class="form-control" name="course_id" required>
+                                    <option value="">Select Course</option>
+                                    {% for course in courses %}
+                                    <option value="{{ course.id }}">{{ course.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <small class="text-muted">This will generate invoices for all students in the selected
+                                    course based on Fee Structures.</small>
+                            </div>
+
+                            {% if messages %}
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary btn-block">Generate Invoices</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}

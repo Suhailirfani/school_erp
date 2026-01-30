@@ -1,0 +1,43 @@
+{% extends 'Management/base_template.html' %}
+
+{% block page_title %}
+Management Dashboard
+{% endblock page_title %}
+
+{% block main_content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 col-6">
+                <!-- small box -->
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>10,00,000</h3>
+                        <p>Total Revenue (Year)</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-cash"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <!-- small box -->
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>95<sup style="font-size: 20px">%</sup></h3>
+                        <p>Fee Collection Rate</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-stats-bars"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock main_content %}

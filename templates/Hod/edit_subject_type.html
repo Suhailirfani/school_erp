@@ -1,0 +1,54 @@
+{% extends 'Hod/base_template.html' %}
+
+{% block page_title %}
+Edit Subject Type
+{% endblock page_title %}
+
+{% block main_content %}
+
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Edit Subject Type</h3>
+                    </div>
+
+                    <form role="form" action="{% url 'edit_subject_type' subject_type.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Subject Type Name</label>
+                                <input type="text" class="form-control" name="name" value="{{ subject_type.name }}"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                {% if messages %}
+                                {% for message in messages %}
+                                {% if message.tags == 'error' %}
+                                <div class="alert alert-danger" style="margin-top:10px">{{ message }}</div>
+                                {% endif %}
+                                {% if message.tags == 'success' %}
+                                <div class="alert alert-success" style="margin-top:10px">{{ message }}</div>
+                                {% endif %}
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+
+                        </div>
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary btn-block">Update Subject Type</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock main_content %}

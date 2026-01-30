@@ -1,0 +1,49 @@
+{% extends 'Accountant/base_template.html' %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Manage Fee Heads</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for head in fee_heads %}
+                                <tr>
+                                    <td>{{ head.id }}</td>
+                                    <td>{{ head.name }}</td>
+                                    <td>{{ head.description }}</td>
+                                    <td>
+                                        <a href="{% url 'edit_fee_head' head.id %}"
+                                            class="btn btn-sm btn-primary">Edit</a>
+                                        <a href="{% url 'delete_fee_head' head.id %}"
+                                            class="btn btn-sm btn-danger">Delete</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <a href="{% url 'add_fee_head' %}" class="btn btn-primary btn-block">Add Fee Head</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}

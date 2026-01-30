@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}View Results{% endblock %}
+
+{% block page_header %}View Student Results{% endblock %}
+
+
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-purple">
+            <div class="card-header">
+                <h3 class="card-title">Filter Results</h3>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="mb-2">View Type</label><br>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="view_type" id="view_class_wise"
+                                    value="class_wise" checked>
+                                <label class="form-check-label" for="view_class_wise">Class Wise (Subject
+                                    Result)</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="view_type" id="view_student_wise"
+                                    value="student_wise">
+                                <label class="form-check-label" for="view_student_wise">Student Wise (Progress
+                                    Card)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Examination</label>
+                            <select class="form-control" name="exam" id="exam">
+                                <option value="">Select Examination</option>
+                                {% for exam in exams %}
+                                <option value="{{ exam.id }}">{{ exam.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Course</label>
+                            <select class="form-control" name="course" id="course">
+                                <option value="">Select Course</option>
+                                {% for course in courses %}
+                                <option value="{{ course.id }}">{{ course.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3" id="subject_div">
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <select class="form-control" name="subject" id="subject">
+                                <option value="">Select Subject</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3" id="student_div" style="display: none;">
+                        <div class="form-group">
+                            <label>Student</label>
+                            <select class="form-control" name="student" id="student">
+                                <option value="">Select Student</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 text-end">
+                        <div class="form-group" style="margin-top: 30px;">
+                            <button type="button" class="btn btn-primary" id="fetch_result">Fetch Result</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4" id="result_area" style="display: none;">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title">Result List</h3>
+                <form id="pdf_form" method="POST" action="{% url 'generate_result_pdf' %}" target="_blank">
+                    {% csrf_token %}
+                    <input type="hidden" name="pdf_view_type" id="pdf_view_type">
+                    <input type="hidden" name="pdf_course_id" id="pdf_course_id">
+                    <input type="hidden" name="pdf_exam_id" id="pdf_exam_id">
+                    <input type="hidden" name="pdf_subject_id" id="pdf_subject_id">
+                    <input type="hidden" name="pdf_student_id" id="pdf_student_id">
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                </form>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" id="result_table">
+                        <thead id="table_head">
+                            <!-- Dynamic Headers -->
+                        </thead>
+                        <tbody id="table_body">
+                            <!-- Dynamic Body -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer" id="result_footer">
+                <!-- Totals or Summary if needed -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        // Toggle Filters based on View Type
+        $('input[name="view_type"]').change(function () {
+            var viewType = $(this).val();
+            if (viewType == 'class_wise') {
+                $('#subject_div').show();
+                $('#student_div').hide();
+            } else {
+                $('#subject_div').hide();
+                $('#student_div').show();
+            }
+            $('#result_area').hide(); // Hide result area on switch
+        });
+
+        // Fetch Subjects and Students when Course Changes
+        $('#course').change(function () {
+            var course_id = $(this).val();
+
+            // Fetch Subjects
+            $.ajax({
+                url: '{% url "admin_get_subjects" %}',
+                type: 'POST',
+                data: { course_id: course_id },
+                success: function (response) {
+                    var json_data = JSON.parse(response);
+                    var html_data = "<option value=''>Select Subject</option>";
+                    for (key in json_data) {
+                        html_data += "<option value='" + json_data[key]['id'] + "'>" + json_data[key]['name'] + "</option>";
+                    }
+                    $('#subject').html(html_data);
+                }
+            });
+
+            // Fetch Students (reusing existing endpoint if available or create new logic)
+            // Ideally we need an endpoint that returns students for a course
+            // I'll assume we can use the result fetching or specialized student fetch.
+            // Let's check `admin_get_students_for_result` - that needs Subject. 
+            // We need just students by Course.
+            // `Staff_views.get_students` does this but it's for Staff.
+            // I'll use a new specialized ajax call or similar.
+
+            // For now, let's implement a simple fetch for students
+            $.ajax({
+                url: '{% url "admin_get_students" %}', // Need to ensure this exists or create it
+                type: 'POST',
+                data: { course_id: course_id },
+                success: function (response) {
+                    var json_data = JSON.parse(response);
+                    var html_data = "<option value=''>Select Student</option>";
+                    for (key in json_data) {
+                        html_data += "<option value='" + json_data[key]['id'] + "'>" + json_data[key]['name'] + "</option>";
+                    }
+                    $('#student').html(html_data);
+                }
+            });
+        });
+
+        // Fetch Result Data
+        $('#fetch_result').click(function () {
+            var course_id = $('#course').val();
+            var view_type = $('input[name="view_type"]:checked').val();
+            var subject_id = $('#subject').val();
+            var student_id = $('#student').val();
+            var exam_id = $('#exam').val();
+
+            if (course_id == "") {
+                alert("Please select a Course");
+                return;
+            }
+
+            if (view_type == 'class_wise' && subject_id == "") {
+                alert("Please select a Subject");
+                return;
+            }
+
+            if (view_type == 'student_wise' && student_id == "") {
+                alert("Please select a Student");
+                return;
+            }
+
+            // Set data for PDF form
+            $('#pdf_view_type').val(view_type);
+            $('#pdf_course_id').val(course_id);
+            $('#pdf_exam_id').val(exam_id);
+            $('#pdf_subject_id').val(subject_id);
+            $('#pdf_student_id').val(student_id);
+
+            $.ajax({
+                url: '{% url "admin_get_result_data" %}',
+                type: 'POST',
+                data: {
+                    view_type: view_type,
+                    course_id: course_id,
+                    exam_id: exam_id,
+                    subject_id: subject_id,
+                    student_id: student_id
+                },
+                success: function (response) {
+                    var json_data = JSON.parse(response);
+                    var table_head = "";
+                    var table_body = "";
+
+                    if (view_type == 'class_wise') {
+                        // Columns: Student Name, CE Marks, TE Marks, Total
+                        table_head = "<tr><th>Student Name</th><th>CE Marks</th><th>TE Marks</th><th>Total</th><th>Status</th></tr>";
+                        if (json_data.length > 0) {
+                            for (key in json_data) {
+                                var total = json_data[key]['total_marks'];
+                                var status = total >= 35 ? '<span class="badge bg-success">Pass</span>' : '<span class="badge bg-danger">Fail</span>'; // Simple logic
+                                table_body += "<tr>";
+                                table_body += "<td>" + json_data[key]['name'] + "</td>";
+                                table_body += "<td>" + json_data[key]['ce_marks'] + "</td>";
+                                table_body += "<td>" + json_data[key]['te_marks'] + "</td>";
+                                table_body += "<td>" + total + "</td>";
+                                table_body += "<td>" + status + "</td>";
+                                table_body += "</tr>";
+                            }
+                        } else {
+                            table_body = "<tr><td colspan='5' class='text-center'>No results found</td></tr>";
+                        }
+                    } else {
+                        // Student Wise: Subject, CE, TE, Total
+                        table_head = "<tr><th>Subject</th><th>Max CE</th><th>Max TE</th><th>Obtained CE</th><th>Obtained TE</th><th>Total</th><th>Grade</th></tr>";
+                        if (json_data.length > 0) {
+                            var grand_total = 0;
+                            var max_grand_total = 0;
+
+                            for (key in json_data) {
+                                var marks = json_data[key];
+                                var total_bst = marks['total_marks'];
+                                var max_total = marks['max_ce_marks'] + marks['max_te_marks'];
+
+                                grand_total += total_bst;
+                                max_grand_total += max_total;
+
+                                var percentage = (total_bst / max_total) * 100;
+                                var grade = '';
+                                if (percentage >= 90) grade = 'A+';
+                                else if (percentage >= 80) grade = 'A';
+                                else if (percentage >= 70) grade = 'B+';
+                                else if (percentage >= 60) grade = 'B';
+                                else if (percentage >= 50) grade = 'C+';
+                                else if (percentage >= 40) grade = 'C';
+                                else grade = 'D';
+
+                                table_body += "<tr>";
+                                table_body += "<td>" + marks['subject_name'] + "</td>";
+                                table_body += "<td>" + marks['max_ce_marks'] + "</td>";
+                                table_body += "<td>" + marks['max_te_marks'] + "</td>";
+                                table_body += "<td>" + marks['ce_marks'] + "</td>";
+                                table_body += "<td>" + marks['te_marks'] + "</td>";
+                                table_body += "<td>" + total_bst + "</td>";
+                                table_body += "<td>" + grade + "</td>";
+                                table_body += "</tr>";
+                            }
+                            // Add Footer Row for Grand Total
+                            table_body += "<tr class='table-info font-weight-bold'>";
+                            table_body += "<td colspan='5' class='text-end'>Grand Total</td>";
+                            table_body += "<td>" + grand_total.toFixed(2) + " / " + max_grand_total + "</td>";
+                            var final_perc = (grand_total / max_grand_total) * 100;
+                            table_body += "<td>" + final_perc.toFixed(2) + "%</td>";
+                            table_body += "</tr>";
+
+                        } else {
+                            table_body = "<tr><td colspan='7' class='text-center'>No results found</td></tr>";
+                        }
+                    }
+
+                    $('#table_head').html(table_head);
+                    $('#table_body').html(table_body);
+                    $('#result_area').show();
+                },
+                error: function (err) {
+                    alert("Error fetching data");
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

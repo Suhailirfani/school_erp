@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Results - HOD Dashboard{% endblock %}
+
+
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title mb-0">Add / Update Results</h1>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+        <form method="POST" action="">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Course</label>
+                    <select name="course" id="course_id" class="form-select form-control-modern">
+                        <option value="">Select Course</option>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Examination</label>
+                    <select name="exam" id="exam_id" class="form-select form-control-modern">
+                        <option value="">Select Examination</option>
+                        {% for exam in exams %}
+                        <option value="{{ exam.id }}">{{ exam.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Subject</label>
+                    <select name="subject" id="subject_id" class="form-select form-control-modern">
+                        <option value="">Select Subject</option>
+                    </select>
+                </div>
+
+                <div class="col-12 text-end">
+                    <button type="button" class="btn btn-primary btn-modern" id="fetch_students_btn">Fetch
+                        Students</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="student_data_container" style="display:none;">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <h5 class="mb-3 gradient-text">Student List</h5>
+            <div class="table-responsive">
+                <table class="table table-hover" id="result_table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>CE Marks</th>
+                            <th>TE Marks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4 text-end">
+                <button type="button" class="btn btn-success btn-modern" id="save_result_btn">Save Results</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+
+        // Fetch Subjects on Course Change
+        $("#course_id").change(function () {
+            var course_id = $(this).val();
+            if (course_id != "") {
+                $.ajax({
+                    url: "{% url 'admin_get_subjects' %}",
+                    type: 'POST',
+                    data: { course_id: course_id },
+                })
+                    .done(function (response) {
+                        var json_data = JSON.parse(response);
+                        var div_data = "<option value=''>Select Subject</option>";
+                        for (key in json_data) {
+                            div_data += "<option value='" + json_data[key]['id'] + "'>" + json_data[key]['name'] + "</option>";
+                        }
+                        $("#subject_id").html(div_data);
+                    })
+                    .fail(function () {
+                        alert("Error Fetching Subjects");
+                    });
+            }
+        });
+
+        // Fetch Students
+        $("#fetch_students_btn").click(function () {
+            var course_id = $("#course_id").val();
+            var subject_id = $("#subject_id").val();
+            var exam_id = $("#exam_id").val();
+
+            if (course_id == "" || subject_id == "") {
+                alert("Please select Course and Subject");
+                return;
+            }
+
+            $.ajax({
+                url: "{% url 'admin_get_students_for_result' %}",
+                type: 'POST',
+                data: { course_id: course_id, subject_id: subject_id, exam_id: exam_id },
+            })
+                .done(function (response) {
+                    var json_data = JSON.parse(response);
+                    var div_data = "";
+
+                    if (json_data.length > 0) {
+                        $("#student_data_container").show();
+                        for (key in json_data) {
+                            div_data += "<tr>";
+                            div_data += "<td>" + json_data[key]['name'] + "</td>";
+                            div_data += "<td><input type='number' name='ce_marks' class='form-control form-control-modern ce_marks' value='" + json_data[key]['ce_marks'] + "' step='0.01' min='0'></td>";
+                            div_data += "<td><input type='number' name='te_marks' class='form-control form-control-modern te_marks' value='" + json_data[key]['te_marks'] + "' step='0.01' min='0'>";
+                            div_data += "<input type='hidden' name='student_ids' class='student_ids' value='" + json_data[key]['id'] + "'></td>";
+                            div_data += "</tr>";
+                        }
+                        $("#result_table tbody").html(div_data);
+                    }
+                    else {
+                        $("#student_data_container").hide();
+                        alert("No Students Found");
+                    }
+                })
+                .fail(function () {
+                    alert("Error Fetching Students");
+                });
+        });
+
+        // Save Results
+        $("#save_result_btn").click(function () {
+            // Disable button
+            $(this).attr("disabled", "disabled");
+            $(this).text("Saving...");
+
+            var student_ids = [];
+            var ce_marks = [];
+            var te_marks = [];
+            var te_marks = [];
+            var subject_id = $("#subject_id").val();
+            var exam_id = $("#exam_id").val();
+
+            $(".student_ids").each(function () {
+                student_ids.push($(this).val());
+            });
+
+            $(".ce_marks").each(function () {
+                ce_marks.push($(this).val());
+            });
+
+            $(".te_marks").each(function () {
+                te_marks.push($(this).val());
+            });
+
+            $.ajax({
+                url: "{% url 'admin_save_student_result' %}",
+                type: 'POST',
+                data: {
+                    student_ids: student_ids,
+                    ce_marks: ce_marks,
+                    te_marks: te_marks,
+                    subject_id: subject_id,
+                    exam_id: exam_id
+                },
+            })
+                .done(function (response) {
+                    if (response == "True") {
+                        alert("Results Saved Successfully!");
+                    } else {
+                        alert("Failed to save results.");
+                    }
+                    $("#save_result_btn").removeAttr("disabled");
+                    $("#save_result_btn").text("Save Results");
+                })
+                .fail(function () {
+                    alert("Error Saving Results.");
+                    $("#save_result_btn").removeAttr("disabled");
+                    $("#save_result_btn").text("Save Results");
+                });
+        });
+
+    });
+</script>
+{% endblock %}
